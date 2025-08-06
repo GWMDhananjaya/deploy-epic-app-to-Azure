@@ -21,19 +21,19 @@ jobs:
       - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
-          node-version: '22.x'
+          node-version: "22.x"
 
       - name: npm install, build, and test
         run: |
           npm install
           npm run build --if-present
           npm run test --if-present
-      
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: node-app
-          path: .
+
+      - name: Upload build output
+  uses: actions/upload-artifact@v4
+  with:
+    name: node-app
+    path: dist
 
   deploy:
     runs-on: ubuntu-latest
@@ -47,7 +47,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: node-app
-      
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -56,10 +56,10 @@ jobs:
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_BCCBCA8D5E8D4F1FBDC7FF56E5A09D0D }}
 
       - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
-        with:
-          app-name: 'epic'
-          slot-name: 'Production'
-          package: .
-          
+  uses: azure/webapps-deploy@v3
+  id: deploy-to-webapp
+  with:
+    app-name: 'epic'
+    slot-name: 'Production'
+    package: dist
+
